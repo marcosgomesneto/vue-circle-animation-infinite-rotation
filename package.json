@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
-    "deploy": "firebase deploy --only hosting:vue3-circle-animation"
+    "deploy": "npm run build && firebase deploy --only hosting:vue3-circle-animation"
   },
   "dependencies": {
     "pinia": "^2.1.7",

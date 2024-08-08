@@ -1,7 +1,7 @@
 {
   "hosting": {
     "site": "vue3-circle-animation",
-    "public": "public",
+    "public": "dist",
     "ignore": [
       "firebase.json",
       "**/.*",
