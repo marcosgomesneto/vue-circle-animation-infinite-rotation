@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { Icon } from "@iconify/vue";
 
 const currentRotate = ref<number>(0);
-const itemsCount = 20;
+const itemsCount = ref(20);
 const currentItem = ref<number>(0);
+const size = ref(13);
+
+window.document.documentElement.style.overflow = "scroll";
 
 function rotate(selectedItem: number) {
   currentItem.value = selectedItem;
-  const itemRelativeDegrees = (360 / itemsCount) * selectedItem;
-  const multiplier = Math.ceil(   
+  const itemRelativeDegrees = (360 / itemsCount.value) * selectedItem;
+  const multiplier = Math.ceil(
     (itemRelativeDegrees + currentRotate.value) / 360
   );
 
@@ -22,72 +26,98 @@ function rotate(selectedItem: number) {
 </script>
 
 <template>
-  <section class="bg-dark-950 min-h-svh w-full bg-white">
-    <svg class="h-0">
-      <defs>
-        <clipPath id="circlePath" clipPathUnits="objectBoundingBox">
-          <path
-            d="M1 0.923C1 0.966 0.932 1 0.85 0.994C0.64 0.978 0.445 0.929 0.293 0.852C0.105 0.758 0 0.631 0 0.498C0 0.364 0.105 0.236 0.293 0.142C0.445 0.066 0.64 0.017 0.85 0.001C0.932 -0.005 1 0.029 1 0.071C1 0.112 0.932 0.145 0.85 0.154C0.721 0.168 0.6 0.201 0.505 0.249C0.374 0.315 0.3 0.404 0.3 0.498C0.3 0.591 0.374 0.681 0.505 0.747C0.6 0.795 0.721 0.828 0.85 0.842C0.932 0.851 1 0.884 1 0.925Z"
-          />
-        </clipPath>
-      </defs>
-    </svg>
-    <div class="mx-auto w-full bg-core-purple-300">
+  <section
+    class="bg-dark-950 min-h-svh w-full bg-white flex items-center justify-center"
+  >
+    <div class="relative md:w-[600px] md:h-[600px] w-full aspect-square">
       <div
-        class="relative w-auto h-[100vw] md:h-auto bg-red-500 md:w-[50%] md:max-w-[300px] rotate-90 md:rotate-0 inline-block md:block origin-[right_center]"
-        :style="{
-          clipPath: 'url(#circlePath)',
-        }"
+        class="absolute z-20 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center"
       >
-        <div class="md:h-0 md:w-full md:pb-[200%] w-[calc(100vw*0.5)]">
+        <div>Click on any image</div>
+        <div class="flex items-center justify-center gap-3 pt-3 text-2xl">
+          <Icon
+            icon="gala:remove"
+            class="text-3xl cursor-pointer"
+            @click="itemsCount--"
+          />
+          {{ itemsCount }}
+          <Icon
+            icon="gala:add"
+            class="text-3xl cursor-pointer"
+            @click="itemsCount++"
+          />
+        </div>
+        <div class="flex items-center justify-center gap-3 pt-3 text-2xl">
+          <Icon
+            icon="gala:remove"
+            class="text-3xl cursor-pointer"
+            @click="size--"
+          />
+          {{ size }}
+          <Icon
+            icon="gala:add"
+            class="text-3xl cursor-pointer"
+            @click="size++"
+          />
+        </div>
+        <div class="pt-3">
+          Sin: 360 / {{ itemsCount }} * {{ currentItem }} + {{ itemsCount }} / 2
+        </div>
+        <div>
+          Cos: 360 / {{ itemsCount }} * {{ currentItem }} + {{ itemsCount }} / 2
+        </div>
+      </div>
+      <div class="absolute -left-14 top-1/2 -translate-y-16">
+        <Icon icon="mynaui:fat-arrow-right" class="text-slate-500 text-5xl" />
+      </div>
+      <div
+        class="absolute flex h-full w-full items-center justify-center gap-3 rotate-[9deg]"
+      >
+        <div class="absolute bottom-[1%] left-[1%] right-[1%] top-[1%]">
           <div
-            class="absolute flex h-full items-center justify-center gap-3 overflow-hidden pr-[200%] rotate-[9deg]"
-          >
-            <div class="absolute bottom-[1%] left-[1%] right-[1%] top-[1%]">
-              <div
-                class="absolute h-[13%] w-[13%] z-10 rounded-full border-4 border-[#000]"
-                :style="{
-                  left: `calc(43.5% + cos((360 / ${itemsCount} * ${
-                    itemsCount / 2
-                  }
+            class="absolute z-10 rounded-full border-4 border-[#000]"
+            :style="{
+              width: `${size}%`,
+              height: `${size}%`,
+              left: `calc( ${50 - size/2}% + cos((360 / ${itemsCount} * ${itemsCount / 2}
                   ) * pi / 180) * (43.5%))`,
-                  top: `calc(43.5% + sin((360 / ${itemsCount} * ${
-                    itemsCount / 2
-                  }
+              top: `calc( ${50 - size/2}% + sin((360 / ${itemsCount} * ${itemsCount / 2}
                   ) * pi / 180) * 43.5%)`,
-                }"
-              ></div>
-            </div>
-            <div
-              class="absolute bottom-[1%] left-[1%] right-[1%] top-[1%] transition-all ease-in-out duration-1000"
-              :style="{
-                transform: `rotate(${currentRotate}deg)`,
-              }"
-            >
-              <div
-                v-for="(_, i) in Array.from({ length: itemsCount })"
-                @click="rotate(i)"
-                :class="[`absolute h-[13%] w-[13%] cursor-pointer transition-all ease-in-out duration-1000 shadow-lg border-4 border-[#fff] rounded-full`]"
-                :style="{
-                  transform: `rotate(calc(${(currentRotate + 9) * -1}deg))`,
-                  left: `calc(43.5% + cos((360 / ${itemsCount} * ${
-                    i + itemsCount / 2
-                  }) * pi / 180) * (43.5%))`,
-                  top: `calc(43.5% + sin((360 / ${itemsCount} * ${
-                    i + itemsCount / 2
-                  }) * pi / 180) * 43.5%)`,
-                }"
-              >
-              <div :class="[currentItem == i && 'curraent-item']">
-                <img
-                  class="rounded-full -rotate-90 md:rotate-0"
-                  :src="`https://xsgames.co/randomusers/avatar.php?g=female&n=${
-                    i + 1
-                  }`"
-                  alt=""
-                />
-              </div>
-              </div>
+            }"
+          ></div>
+        </div>
+        <div
+          class="absolute bottom-[1%] left-[1%] right-[1%] top-[1%] transition-all ease-in-out duration-[3s]"
+          :style="{
+            transform: `rotate(${currentRotate}deg)`,
+          }"
+        >
+          <div
+            v-for="(_, i) in Array.from({ length: itemsCount })"
+            @click="rotate(i)"
+            :class="[
+              `absolute cursor-pointer transition-all ease-in-out duration-[3s] shadow-lg border-4 border-[#fff] rounded-full`,
+            ]"
+            :style="{
+              width: `${size}%`,
+              height: `${size}%`,
+              transform: `rotate(calc(${(currentRotate + 9) * -1}deg))`,
+              left: `calc(${50 - size/2}% + cos((360 / ${itemsCount} * ${
+                i + itemsCount / 2
+              }) * pi / 180) * (43.5%))`,
+              top: `calc(${50 - size/2}% + sin((360 / ${itemsCount} * ${
+                i + itemsCount / 2
+              }) * pi / 180) * 43.5%)`,
+            }"
+          >
+            <div :class="[currentItem == i && 'curraent-item']">
+              <img
+                class="rounded-full md:rotate-0"
+                :src="`https://xsgames.co/randomusers/avatar.php?g=female&n=${
+                  i + 1
+                }`"
+                alt=""
+              />
             </div>
           </div>
         </div>
@@ -97,7 +127,6 @@ function rotate(selectedItem: number) {
 </template>
 
 <style scoped>
-
 @keyframes selectedAnimation {
   0% {
     transform: scale(1) translateX(0);
@@ -107,11 +136,9 @@ function rotate(selectedItem: number) {
   }
 }
 
-.current-item{
+.current-item {
   animation: selectedAnimation 1s backwards 700ms;
 }
-
-
 
 header {
   line-height: 1.5;
